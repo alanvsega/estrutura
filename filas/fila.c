@@ -139,15 +139,21 @@ int ordenaFila(Fila *f) {
 
     int qtd = contaElementos(f);
     elementoFila *e = (elementoFila*) malloc(sizeof(elementoFila));
-    int maior = 0;
+    int i;
 
     e = f->primeiro;
-    while(e != NULL) {
-        if (e->elemento > maior) {
-            maior = e->elemento;
-            //enqueue
+    while (qtd > 0){
+        if (e->elemento > e->prox->elemento) {
+            i = e->elemento;
+            e->elemento = e->prox->elemento;
+            e->prox->elemento = i;
         }
         e = e->prox;
+
+        if (e->prox == NULL) {
+            e = f->primeiro;
+            qtd--;
+        }
     }
 
     return 1;
@@ -160,7 +166,6 @@ Fila* juntaFilas(Fila *q1, Fila *q2) {
 
     Fila *q3 = (Fila*) malloc(sizeof(Fila));
 
-    // elementoFila *e = (elementoFila*) malloc(sizeof(elementoFila));
     int *i = malloc(sizeof(int));
 
     while(!empty(q1)) {
@@ -172,6 +177,8 @@ Fila* juntaFilas(Fila *q1, Fila *q2) {
         dequeue(q2, i);
         enqueue(q3, *i);
     }
+
+    ordenaFila(q3);
 
     return q3;
 }
@@ -195,10 +202,10 @@ int main() {
     Fila *fila2 = init();
     int i;
 
-    for(i=10; i>=1; i--) {
+    for(i=1; i<=10; i++) {
         enqueue(fila1, i);
     }
-    /*
+
     for(i=11; i<=20; i++) {
         enqueue(fila2, i);
     }
@@ -210,10 +217,9 @@ int main() {
 
     printf("Fila 2:\n");
     print(fila2);
-    */
-    printf("Fila 1:\n");
-    ordenaFila(fila1);
-    print(fila1);
+
+    printf("Fila 3:\n");
+    print(juntaFilas(fila1, fila2));
 
     return 0;
 }
