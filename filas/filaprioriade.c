@@ -13,7 +13,7 @@
 typedef struct tipoElementoPrioridade {
     int elemento;
     int prioridade;
-    struct tipoFila *prox;
+    struct tipoElementoPrioridade *prox;
 } elementoFilaPrioridade;
 
 typedef struct tipoFilaPrioridade {
@@ -49,29 +49,40 @@ int first(FilaPrioridade *f, int *elemento, int *prioridade) {
 
 int enqueue(FilaPrioridade *f, int elemento, int prioridade) {
     elementoFilaPrioridade *e = (elementoFilaPrioridade *) malloc(sizeof(elementoFilaPrioridade));
+    elementoFilaPrioridade *e2 = (elementoFilaPrioridade *) malloc(sizeof(elementoFilaPrioridade));
     
-    if (e == NULL) {
+    if (e == NULL || e2 == NULL) {
+        return 0;
+    }
+
+    if (prioridade < 0 || prioridade > 9){
+        printf("Prioridade deve ser entre 0 e 9!\n");
         return 0;
     }
 
     if(empty(f)) {
-        f->primeiro = e;
+        f->primeiro = e2;
     } else {
         e = f->primeiro;
         while(e->prioridade <= prioridade) {
             if(e->prox == NULL) {
-                f->ultimo->prox = e;
+                f->ultimo = e2;
+                break;
             } else {
-                e = e->prox;
+                if (e->prox->prioridade <= prioridade) {
+                    e = e->prox;
+                } else {
+                    break;
+                }                
             }               
         }
         
+        e2->prox = e->prox;
+        e->prox = e2;
     }
 
-    
-    f->ultimo = e;
-    e->elemento = elemento;
-    e->prox = NULL;
+    e2->elemento = elemento;
+    e2->prioridade = prioridade;
 
     return 1;
 }
@@ -84,4 +95,78 @@ int dequeue(FilaPrioridade *f, int *elemento) {
     *elemento = f->primeiro->elemento;
     f->primeiro = f->primeiro->prox;
     return 1;
+}
+
+int print(FilaPrioridade *f) {
+    if (empty(f)) {
+        return 0;
+    }
+
+    elementoFilaPrioridade *e = (elementoFilaPrioridade *) malloc(sizeof(elementoFilaPrioridade));
+
+    if (e == NULL) {
+        return 0;
+    }
+
+    e = f->primeiro;
+    printf("ELEMENTOS - ");
+
+    while(e != NULL) {
+        printf("%d", e->elemento);
+        e = e->prox;
+        if (e != NULL) {
+            printf(", ");
+        }
+    }
+
+    e = f->primeiro;
+    printf("\nPRIORIDAD - ");
+
+    while(e != NULL) {
+        printf("%d", e->prioridade);
+        e = e->prox;
+        if (e != NULL) {
+            printf(", ");
+        }
+    }
+    printf("\n");
+
+    return 1;
+}
+
+int main() {
+    FilaPrioridade *fila1 = init();
+    FilaPrioridade *fila2 = init();
+    int i;
+    
+    enqueue(fila1, 1, 0);
+    enqueue(fila1, 2, 0);
+    enqueue(fila1, 3, 1);
+    enqueue(fila1, 4, 1);
+    enqueue(fila1, 2, 2);
+    enqueue(fila1, 2, 2);
+    enqueue(fila1, 5, 3);
+    enqueue(fila1, 1, 3);
+    enqueue(fila1, 3, 4);
+    enqueue(fila1, 5, 4);
+    enqueue(fila1, 7, 5);
+    enqueue(fila1, 9, 5);
+
+    printf("Fila 1:\n");
+    print(fila1);
+
+    enqueue(fila1, 9, 0);
+    enqueue(fila1, 7, 4);
+    enqueue(fila1, 6, 1);
+    enqueue(fila1, 0, 7);
+    enqueue(fila1, 9, 9);
+    enqueue(fila1, 1, 8);
+
+    printf("Fila 1 dps de inserir 9/0:\n");
+    print(fila1);
+
+    printf("Primeiro = %d/%d\n", fila1->primeiro->elemento, fila1->primeiro->prioridade);
+    printf("Ultimo = %d/%d\n", fila1->ultimo->elemento, fila1->ultimo->prioridade);
+
+    return 0;
 }
