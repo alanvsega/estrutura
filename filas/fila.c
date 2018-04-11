@@ -143,27 +143,31 @@ int ordenaFila(Fila *f) {
         return 0;
     }
 
-    int qtd = contaElementos(f);
+    //int qtd = contaElementos(f);
     elementoFila *e = (elementoFila*) malloc(sizeof(elementoFila));
 
     if (e == NULL) {
         return 0;
     }
 
-    int i;
+    int i, qtd = 0;
 
     e = f->primeiro;
-    while (qtd > 0){
+    while (qtd >= 0){
         if (e->elemento > e->prox->elemento) {
             i = e->elemento;
             e->elemento = e->prox->elemento;
             e->prox->elemento = i;
+            qtd++;
         }
         e = e->prox;
 
         if (e->prox == NULL) {
+            if (qtd == 0) {
+                break;
+            }
             e = f->primeiro;
-            qtd--;
+            qtd = 0;
         }
     }
 
@@ -247,11 +251,10 @@ int main() {
     Fila *fila1 = init();
     Fila *fila2 = init();
     int i;
-    /*
-    for(i=1; i<=10; i++) {
+    
+    for(i=10; i>=1; i--) {
         enqueue(fila1, i);
     }
-    */
 
     for(i=11; i<=20; i++) {
         enqueue(fila2, i);
